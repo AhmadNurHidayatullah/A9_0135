@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.projectfilm_135.R
@@ -130,6 +131,91 @@ fun HomeScreen(
 }
 
 @Composable
+fun FilmCard(
+    film: Film,
+    modifier: Modifier = Modifier,
+    onDeleteClick: (Film) -> Unit = {}
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(12.dp),
+        shape = MaterialTheme.shapes.large, // Rounded corners
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp), // Soft shadow
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant // Soft background color
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp) // Spacing for clarity
+        ) {
+            // Title and Delete Button Row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = film.judulFilm,
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold), // Bold title
+                    modifier = Modifier.weight(1f)
+                )
+                IconButton(onClick = { onDeleteClick(film) }) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete",
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
+
+            // Film details
+            Text(
+                text = "Durasi: ${film.durasi} menit",
+                style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+            )
+            Text(
+                text = "Genre: ${film.genre}",
+                style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+            )
+        }
+    }
+}
+
+@Composable
+fun OnError(retryAction: () -> Unit, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_connection_error),
+            contentDescription = "",
+            modifier = Modifier.size(100.dp) // Adjust size for better visibility
+        )
+        Text(
+            text = stringResource(R.string.loading_failed),
+            modifier = Modifier.padding(16.dp),
+            style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface)
+        )
+        Button(
+            onClick = retryAction,
+            modifier = Modifier.padding(top = 8.dp),
+            shape = MaterialTheme.shapes.medium // Rounded corners for button
+
+        ) {
+            Text(
+                text = stringResource(R.string.retry),
+                color = MaterialTheme.colorScheme.onPrimary // Contrasting text color for button
+            )
+        }
+    }
+}
+
+@Composable
 fun FilmStatus(
     homeUiState: HomeUiState,
     retryAction: () -> Unit,
@@ -139,49 +225,26 @@ fun FilmStatus(
 ) {
     when (homeUiState) {
         is HomeUiState.Loading -> OnLoading(modifier = modifier.fillMaxSize())
-        is HomeUiState.Success ->
+        is HomeUiState.Success -> {
             if (homeUiState.film.isEmpty()) {
                 Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = "Tidak ada data film")
+                    Text(
+                        text = "Tidak ada data film",
+
+                    )
                 }
             } else {
                 FilmLayout(
-                    film = homeUiState.film, modifier = modifier.fillMaxWidth(),
+                    film = homeUiState.film,
+                    modifier = modifier.fillMaxWidth(),
                     onDetailClick = { onDetailClick(it.idFilm.toString()) },
                     onDeleteClick = { onDeleteClick(it) }
                 )
             }
+        }
         is HomeUiState.Error -> OnError(retryAction, modifier = modifier.fillMaxSize())
     }
 }
-
-@Composable
-fun OnLoading(modifier: Modifier = Modifier) {
-    Image(
-        modifier = modifier.size(200.dp),
-        painter = painterResource(R.drawable.loading),
-        contentDescription =  stringResource(R.string.loading)
-    )
-}
-
-@Composable
-fun OnError(retryAction: () -> Unit, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ){
-        Image(
-            painter = painterResource(id = R.drawable.ic_connection_error), contentDescription = ""
-        )
-        Text(text = stringResource(R.string.loading_failed), modifier = Modifier.padding(16.dp))
-        Button(onClick = retryAction){
-            Text(stringResource(R.string.retry))
-        }
-    }
-}
-
-
 
 @Composable
 fun FilmLayout(
@@ -193,7 +256,7 @@ fun FilmLayout(
     LazyColumn(
         modifier = modifier,
         contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp) // Adjust space between cards
     ) {
         items(film) { film ->
             FilmCard(
@@ -208,42 +271,10 @@ fun FilmLayout(
 }
 
 @Composable
-fun FilmCard(
-    film: Film,
-    modifier: Modifier = Modifier,
-    onDeleteClick: (Film) -> Unit = {}
-) {
-    Card(
-        modifier = modifier.fillMaxWidth().padding(8.dp),
-        shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            // Title and Delete Button Row
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(imageVector = Icons.Filled.Menu, contentDescription = "")
-                Spacer(modifier = Modifier.padding(4.dp))
-                Text(
-                    text = film.judulFilm,
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.weight(1f)
-                )
-                IconButton(onClick = { onDeleteClick(film) }) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete",
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
-            Text(text = "Durasi: ${film.durasi} menit", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Genre: ${film.genre}", style = MaterialTheme.typography.bodyMedium)
-        }
-    }
+fun OnLoading(modifier: Modifier = Modifier) {
+    Image(
+        modifier = modifier.size(200.dp),
+        painter = painterResource(R.drawable.loading),
+        contentDescription = stringResource(R.string.loading)
+    )
 }
