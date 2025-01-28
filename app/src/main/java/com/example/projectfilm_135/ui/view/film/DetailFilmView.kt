@@ -79,7 +79,10 @@ fun DetailFilmView(
                         Icon(imageVector = Icons.Filled.Refresh, contentDescription = "Refresh")
                     }
                 },
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
             )
         },
         floatingActionButton = {
@@ -107,7 +110,8 @@ fun DetailFilmView(
                     Text(
                         text = "Error: Gagal memuat data. Silakan coba lagi.",
                         color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.align(Alignment.Center)
+                        modifier = Modifier.align(Alignment.Center),
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
@@ -126,24 +130,24 @@ fun ItemDetailFilm(
             containerColor = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.onSurface
         ),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        shape = RoundedCornerShape(16.dp), // More rounded corners
+        elevation = CardDefaults.cardElevation(defaultElevation = 12.dp) // Higher elevation for better visual effect
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(20.dp)) {
             ComponentDetailFilm(judul = "ID Film", isinya = film.idFilm.toString())
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp)) // Adjusted space for balance
 
             ComponentDetailFilm(judul = "Judul Film", isinya = film.judulFilm)
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             ComponentDetailFilm(judul = "Durasi", isinya = "${film.durasi} menit")
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             ComponentDetailFilm(judul = "Deskripsi", isinya = film.deskripsi)
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             ComponentDetailFilm(judul = "Genre", isinya = film.genre)
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             ComponentDetailFilm(judul = "Rating Usia", isinya = film.ratingUsia)
         }
@@ -165,7 +169,7 @@ fun ComponentDetailFilm(
             style = MaterialTheme.typography.titleMedium.copy(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
-                fontSize = 20.sp
+                fontSize = 20.sp // Bigger font for titles
             )
         )
         Text(
@@ -173,7 +177,7 @@ fun ComponentDetailFilm(
             style = MaterialTheme.typography.bodyLarge.copy(
                 fontWeight = FontWeight.Normal,
                 color = MaterialTheme.colorScheme.onSurface,
-                fontSize = 18.sp
+                fontSize = 18.sp // Consistent font size for values
             )
         )
     }
